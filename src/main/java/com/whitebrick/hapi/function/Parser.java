@@ -40,7 +40,7 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
     Response responseBody = null;
     String errorMessage = null;
     String xml = null;
-    String hl7 = null;
+    String er7 = null;
     int statusCode = 200;
 
     Parser parser = new Parser();
@@ -71,19 +71,19 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
         LOG.info("Processing JSON, msgType: " + msgType);
 
         xml = XML.toString(jsonObj).replace("<" + msgType + ">", "<" + msgType + " xmlns=\"urn:hl7-org:v2xml\">");
-        hl7 = parser.xmlToHl7(xml);
+        er7 = parser.xmlToHl7(xml);
 
         // application/xml
       } else if (contentType.toLowerCase().contains("xml")) {
 
         xml = body;
         jsonObj = XML.toJSONObject(xml, true);
-        hl7 = parser.xmlToHl7(xml);
+        er7 = parser.xmlToHl7(xml);
 
         // text/plain
       } else if (contentType.toLowerCase().contains("text")) {
 
-        hl7 = body;
+        er7 = body;
         xml = parser.hl7ToXml(body);
         jsonObj = XML.toJSONObject(xml,true);
 
@@ -102,7 +102,7 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
     Map<String, String> headers = new HashMap<>();
     headers.put("Content-Type", "application/json");
 
-    responseBody = new Response(jsonMap, xml, hl7, errorMessage);
+    responseBody = new Response(jsonMap, xml, er7, errorMessage);
     return ApiGatewayResponse.builder().setStatusCode(statusCode).setObjectBody(responseBody).setHeaders(headers)
         .build();
   }

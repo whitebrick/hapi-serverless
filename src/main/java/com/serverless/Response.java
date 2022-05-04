@@ -6,13 +6,13 @@ public class Response {
 
   private final Map<String, Object> jsonMap;
   private final String xml;
-  private final String hl7;
+  private final String er7;
   private final String error;
 
-  public Response(Map<String, Object> jsonMap, String xml, String hl7, String error) {
+  public Response(Map<String, Object> jsonMap, String xml, String er7, String error) {
     this.jsonMap = jsonMap;
     this.xml = xml;
-    this.hl7 = hl7;
+    this.er7 = er7;
     this.error = error;
   }
 
@@ -24,8 +24,8 @@ public class Response {
     return this.xml;
   }
 
-  public String getHl7() {
-    return this.hl7;
+  public String getEr7() {
+    return this.er7;
   }
 
   public String getError() {

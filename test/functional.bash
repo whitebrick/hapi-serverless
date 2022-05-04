@@ -20,7 +20,7 @@ function check_result () {
   cmd="cat tmp_response_all.json | node json2console.js xml > tmp_response_xml.xml"
   echo $cmd
   eval $cmd
-  cmd="cat tmp_response_all.json | node json2console.js hl7  > tmp_response_hl7.hl7"
+  cmd="cat tmp_response_all.json | node json2console.js er7  > tmp_response_er7.er7"
   echo $cmd
   eval $cmd
   cmd="cat tmp_response_all.json | node json2console.js error  > tmp_response_error.txt"
@@ -57,13 +57,13 @@ function check_result () {
     echo -e "OK"
   fi
 
-  echo -e "\n- Checking HL7 response..."
-  cmd="diff -q --ignore-blank-lines tmp_response_hl7.hl7 cerner_ORU_R01.hl7"
+  echo -e "\n- Checking ER7 response..."
+  cmd="diff -q --ignore-blank-lines tmp_response_er7.er7 cerner_ORU_R01.er7"
   echo $cmd
   eval $cmd
 
   if [ $? -ne 0 ]; then
-    echo -e "n\Error: HL7 diff failed\n"
+    echo -e "n\Error: ER7 diff failed\n"
     exit 1
   else
     echo -e "OK"
@@ -79,14 +79,14 @@ check_result
 
 echo -e "\n\n==== Test 2/3 Sending XML format..."
 
-cmd="curl -s -X POST -H \"Content-Type: x-application/hl7-v2+xml\" --data-binary @./cerner_ORU_R01.xml $ENDPOINT > tmp_response_all.json"
+cmd="curl -s -X POST -H \"Content-Type: application/xml\" --data-binary @./cerner_ORU_R01.xml $ENDPOINT > tmp_response_all.json"
 echo -e "\n$cmd\n"
 eval $cmd
 check_result
 
-echo -e "\n\n==== Test 3/3 Sending HL7 format..."
+echo -e "\n\n==== Test 3/3 Sending ER7 format..."
 
-cmd="curl -s -X POST -H \"Content-Type: text/plain\" --data-binary @./cerner_ORU_R01.hl7 $ENDPOINT > tmp_response_all.json"
+cmd="curl -s -X POST -H \"Content-Type: text/plain\" --data-binary @./cerner_ORU_R01.er7 $ENDPOINT > tmp_response_all.json"
 echo -e "\n$cmd\n"
 eval $cmd
 check_result
