@@ -48,8 +48,17 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
 
     try {
 
-      Object headers = input.get("headers");
-      String contentType = ((Map<String, String>) headers).get("Content-Type");
+      Map<String, String> headersMap = ((Map<String, String>) input.get("headers"));
+      String contentType;
+      
+      if(headersMap.containsKey("Content-Type")) {
+        contentType = headersMap.get("Content-Type");
+      } else if(headersMap.containsKey("content-type")) {
+        contentType = headersMap.get("content-type");
+      } else {
+        throw new Exception("Could not find Content-Type or content-type header");
+      }
+      
       LOG.info("Content-Type: " + contentType.toLowerCase());
 
       String body = String.valueOf(input.get("body"));
@@ -64,22 +73,22 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
         xml = XML.toString(jsonObj).replace("<" + msgType + ">", "<" + msgType + " xmlns=\"urn:hl7-org:v2xml\">");
         hl7 = parser.xmlToHl7(xml);
 
-        // x-application/hl7-v2+xml
+        // application/xml
       } else if (contentType.toLowerCase().contains("xml")) {
 
         xml = body;
         jsonObj = XML.toJSONObject(xml, true);
         hl7 = parser.xmlToHl7(xml);
 
-        // x-application/hl7-v2+er7
-      } else if (contentType.toLowerCase().contains("er7")) {
+        // text/plain
+      } else if (contentType.toLowerCase().contains("text")) {
 
         hl7 = body;
         xml = parser.hl7ToXml(body);
         jsonObj = XML.toJSONObject(xml,true);
 
       } else {
-        throw new Exception("Content-Type header must include 'json' or 'xml' or 'er7'");
+        throw new Exception("Content-Type header must include 'json' or 'xml' or 'text'");
       }
 
       jsonMap = new ObjectMapper().readValue(jsonObj.toString(), Map.class);
