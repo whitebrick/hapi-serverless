@@ -4,7 +4,7 @@
 
 This is a fork of [node-hl7-complete](https://github.com/MatthewVita/node-hl7-complete) refactored as a Java-only function and packaged with the [Serverless](https://github.com/serverless/serverless) framework for easy deployment to AWS Lambda and other cloud platforms.
 
-Deploying this stack stands up a HTTP endpoint that supports transforms of HL7 v2.x messages between `JSON`, `XML` and `ER7` (pipe-delimited) formats using [Java Hapi](https://hapifhir.github.io), the gold standard for HL7 parsing.
+When deployed this stack stands up a HTTP endpoint that supports transforms of HL7 v2.x messages between `JSON`, `XML` and `ER7` (pipe-delimited) formats using [Java Hapi](https://hapifhir.github.io), the gold standard for HL7 parsing.
 
 ### Overview
 
