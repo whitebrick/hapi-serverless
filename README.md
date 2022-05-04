@@ -1,6 +1,6 @@
 # hapi-serverless
 
-#### HL7 2.x JSON/XML/ER7 (Pipe-delimited) Message Parser/Transformer
+#### HL7 2.x JSON/XML/ER7 (Pipe-delimited) Message Parser & Transformer
 
 This is a fork of [node-hl7-complete](https://github.com/MatthewVita/node-hl7-complete) refactored as a Java-only function and packaged with the [Serverless](https://github.com/serverless/serverless) framework for easy deployment to AWS Lambda and other cloud platforms.
 
