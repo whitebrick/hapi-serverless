@@ -72,10 +72,10 @@ npm install
 mvn package
 
 # serverless-offline uses docker to support java8
-# pull the image first so it's ready rather than on the first server request
+# pull the image first so it's ready rather than keeping the initial server request hanging
 docker pull lambci/lambda:java8
 
-# watch for changes of the jar and start the local server
+# watches for changes of the jar and start the local server
 npm start
 ```
 
