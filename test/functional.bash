@@ -1,6 +1,7 @@
 # !/usr/bin/env bash
 
-ENDPOINT="http://localhost:3000/"
+ENDPOINT="http://localhost:3000/dev"
+#ENDPOINT="https://hapi.whitebrick.com/"
 
 echo -e "\nTesting against endpoint: $ENDPOINT"
 
@@ -85,7 +86,7 @@ check_result
 
 echo -e "\n\n==== Test 3/3 Sending HL7 format..."
 
-cmd="curl -s -X POST -H \"Content-Type: x-application/hl7-v2+er7\" --data-binary @./cerner_ORU_R01.hl7 $ENDPOINT > tmp_response_all.json"
+cmd="curl -s -X POST -H \"Content-Type: text/plain\" --data-binary @./cerner_ORU_R01.hl7 $ENDPOINT > tmp_response_all.json"
 echo -e "\n$cmd\n"
 eval $cmd
 check_result
