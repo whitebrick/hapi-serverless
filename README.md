@@ -98,4 +98,4 @@ serverless deploy [--stage <stage>]
 
 ### Troubleshooting
 
-- Line-endings and escaping can cause issues between different operating systems when dealing with these formats. ER7 requires  `\r` so check text carefully.
+- Line-endings and escaping can cause issues between different operating systems when dealing with these formats. ER7 requires  `\r` so some text post-processing may be needed.
