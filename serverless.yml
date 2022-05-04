@@ -3,8 +3,8 @@ service: hapi-serverless
 provider:
   name: aws
   runtime: java8
-#  region: eg us-east-1
-#  profile: eg my-profile
+  # region: eg us-east-1
+  # profile: eg my-awscli-profile
 
 package:
   artifact: target/hapi-serverless.jar
@@ -13,7 +13,7 @@ functions:
   hapiParser:
     handler: com.whitebrick.hapi.function.Parser
     events:
-      - httpApi:
+      - http:
           path: /
           method: post
 
