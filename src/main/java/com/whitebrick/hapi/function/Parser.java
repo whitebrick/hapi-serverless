@@ -1,13 +1,25 @@
 package com.whitebrick.hapi.function;
 
 import com.serverless.ApiGatewayResponse;
-import com.serverless.Response;
 
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.io.IOException;
 import java.util.HashMap;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
@@ -20,8 +32,9 @@ import org.json.JSONObject;
 import org.json.XML;
 
 /**
- * hapi-serverless parser https://github.com/whitebrick/hapi-serverless
- * Forked from XML-HL7 parser by Matthew Vita https://github.com/MatthewVita/node-hl7-complete
+ * hapi-serverless parser https://github.com/whitebrick/hapi-serverless Forked
+ * from XML-HL7 parser by Matthew Vita
+ * https://github.com/MatthewVita/node-hl7-complete
  */
 public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayResponse> {
 
@@ -41,52 +54,53 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
     String errorMessage = null;
     String xml = null;
     String er7 = null;
+    String fwdEr7 = null;
+    Map<String, Object> fwdJsonMap = null;
+    String fwdXml = null;
+    
     int statusCode = 200;
 
     Parser parser = new Parser();
     parser.setStrictMode(false);
 
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+
     try {
 
-      Map<String, String> headersMap = ((Map<String, String>) input.get("headers"));
+      requestHeaders = ((Map<String, String>) input.get("headers")).entrySet().stream()
+          .collect(Collectors.toMap(entry -> entry.getKey().toLowerCase(), entry -> entry.getValue()));
+
       String contentType;
-      
-      if(headersMap.containsKey("Content-Type")) {
-        contentType = headersMap.get("Content-Type");
-      } else if(headersMap.containsKey("content-type")) {
-        contentType = headersMap.get("content-type");
+
+      if (requestHeaders.containsKey("content-type")) {
+        contentType = requestHeaders.get("content-type");
       } else {
-        throw new Exception("Could not find Content-Type or content-type header");
+        throw new Exception("Could not find Content-Type header");
       }
-      
+
       LOG.info("Content-Type: " + contentType.toLowerCase());
 
       String body = String.valueOf(input.get("body"));
 
       // application/json
       if (contentType.toLowerCase().contains("json")) {
-
         jsonObj = new JSONObject(body);
         String msgType = jsonObj.keySet().iterator().next();
         LOG.info("Processing JSON, msgType: " + msgType);
-
         xml = XML.toString(jsonObj).replace("<" + msgType + ">", "<" + msgType + " xmlns=\"urn:hl7-org:v2xml\">");
         er7 = parser.xmlToHl7(xml);
 
         // application/xml
       } else if (contentType.toLowerCase().contains("xml")) {
-
         xml = body;
         jsonObj = XML.toJSONObject(xml, true);
         er7 = parser.xmlToHl7(xml);
-
+        
         // text/plain
       } else if (contentType.toLowerCase().contains("text")) {
-
         er7 = body;
         xml = parser.hl7ToXml(body);
-        jsonObj = XML.toJSONObject(xml,true);
-
+        jsonObj = XML.toJSONObject(xml, true);
       } else {
         throw new Exception("Content-Type header must include 'json' or 'xml' or 'text'");
       }
@@ -99,11 +113,48 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
       errorMessage = e.getMessage();
     }
 
-    Map<String, String> headers = new HashMap<>();
-    headers.put("Content-Type", "application/json");
+    if (requestHeaders.containsKey("mllp-gateway") && requestHeaders.containsKey("forward-to")) {
+      
+      LOG.info("MLLP-Gateway and Forward-To headers found... forwarding POST request to "+requestHeaders.get("mllp-gateway"));
+      
+      CloseableHttpClient httpClient = HttpClients.custom()
+      .setSSLHostnameVerifier(new NoopHostnameVerifier())
+      .build();
+      
+      HttpPost post = new HttpPost(requestHeaders.get("mllp-gateway"));
+      post.setHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
+      post.setHeader("forward-to", requestHeaders.get("forward-to"));
+      StringEntity requestEntity = new StringEntity(er7, ContentType.DEFAULT_TEXT);
+      post.setEntity(requestEntity);
+      try {
+        HttpResponse fwdResponse = httpClient.execute(post);
+        HttpEntity fwdResponseBodyentity = fwdResponse.getEntity();
+        String fwdResponseBodyString = EntityUtils.toString(fwdResponseBodyentity);
+        JSONObject fwdResponseJsonObj = new JSONObject(fwdResponseBodyString);
+        
+        fwdEr7 = fwdResponseJsonObj.getString("er7");
+        fwdXml = parser.hl7ToXml(fwdEr7);
+        JSONObject fwdJsonObj = XML.toJSONObject(fwdXml, true);
+        fwdJsonMap = new ObjectMapper().readValue(fwdJsonObj.toString(), Map.class);
+        
+      } catch (Exception e) {
+        System.out.println("Error forwarding/parsing with "+requestHeaders.get("mllp-gateway"));
+        e.printStackTrace();
+      } finally {
+        try {
+          httpClient.close();
+        } catch (IOException e) {
+          System.out.println("Error closing stream after sending HTTP POST to "+requestHeaders.get("mllp-gateway"));
+          e.printStackTrace();
+        }
+      }
+    }
 
-    responseBody = new Response(jsonMap, xml, er7, errorMessage);
-    return ApiGatewayResponse.builder().setStatusCode(statusCode).setObjectBody(responseBody).setHeaders(headers)
+    Map<String, String> responseHeaders = new HashMap<>();
+    responseHeaders.put("Content-Type", "application/json");
+
+    responseBody = new Response(jsonMap, xml, er7, errorMessage, fwdJsonMap, fwdXml, fwdEr7);
+    return ApiGatewayResponse.builder().setStatusCode(statusCode).setObjectBody(responseBody).setHeaders(responseHeaders)
         .build();
   }
 

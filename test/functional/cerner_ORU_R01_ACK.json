@@ -1,0 +1,49 @@
+{
+  "ORU_R01": {
+    "MSH": {
+      "MSH.1": "|",
+      "MSH.2": "^~\\&",
+      "MSH.3": {
+        "HD.1": "VISN_OUT",
+        "HD.2": "VISN_OUT",
+        "HD.3": "L"
+      },
+      "MSH.4": {
+        "HD.1": "VISN_OUT",
+        "HD.2": "VISN_OUT",
+        "HD.3": "L"
+      },
+      "MSH.5": {
+        "HD.1": "HealthSentry",
+        "HD.2": "HealthSentry",
+        "HD.3": "L"
+      },
+      "MSH.6": {
+        "HD.1": "Baseline West MC",
+        "HD.2": "33D1234567",
+        "HD.3": "L"
+      },
+      "MSH.7": {
+      },
+      "MSH.9": {
+        "MSG.1": "ACK",
+        "MSG.2": "R01",
+        "MSG.3": "ORU_R01"
+      },
+      "MSH.10": "201010010913000772A",
+      "MSH.11": {
+        "PT.1": "P"
+      },
+      "MSH.12": {
+        "VID.1": "2.5.1"
+      },
+      "MSH.21": {
+        "EI.1": "PHLabReport-NoAck",
+        "EI.3": "2.16.840.1.114222.4.10.3",
+        "EI.4": "ISOMSA"
+      },
+      "MSH.22": "AA",
+      "MSH.23": "201010010913000772"
+    }
+  }
+}

@@ -3,7 +3,7 @@
 ENDPOINT="http://localhost:3000/dev"
 #ENDPOINT="https://hapi.whitebrick.com/"
 
-echo -e "\nTesting against endpoint: $ENDPOINT"
+echo -e "\nTesting parsing against endpoint: $ENDPOINT"
 
 function check_result () {
 

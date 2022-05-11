@@ -3,8 +3,8 @@ service: hapi-serverless
 provider:
   name: aws
   runtime: java8
-  # region: eg us-east-1
-  # profile: eg my-awscli-profile
+  region: us-east-1
+  profile: wb
 
 package:
   artifact: target/hapi-serverless.jar
@@ -16,6 +16,20 @@ functions:
       - http:
           path: /
           method: post
+      - http:
+          path: /
+          method: get
+          integration: mock
+          request:
+            template:
+              application/json: '{"statusCode": 301}'
+          response:
+            template: redirect
+            headers:
+              Location: "'https://whitebrick.com'"
+            statusCodes:
+              301:
+                pattern: ''
 
 plugins:
   - serverless-offline
