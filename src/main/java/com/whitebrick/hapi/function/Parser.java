@@ -54,9 +54,9 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
     String errorMessage = null;
     String xml = null;
     String er7 = null;
-    String fwdEr7 = null;
-    Map<String, Object> fwdJsonMap = null;
-    String fwdXml = null;
+    String retEr7 = null;
+    Map<String, Object> retJsonMap = null;
+    String retXml = null;
     
     int statusCode = 200;
 
@@ -113,7 +113,7 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
       errorMessage = e.getMessage();
     }
 
-    if (requestHeaders.containsKey("mllp-gateway") && requestHeaders.containsKey("forward-to")) {
+    if (requestHeaders.containsKey("mllp-gateway") && requestHeaders.containsKey("forward-to") && statusCode==200) {
       
       LOG.info("MLLP-Gateway and Forward-To headers found... forwarding POST request to "+requestHeaders.get("mllp-gateway"));
       
@@ -125,26 +125,36 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
       post.setHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
       post.setHeader("forward-to", requestHeaders.get("forward-to"));
       StringEntity requestEntity = new StringEntity(er7, ContentType.DEFAULT_TEXT);
+      
       post.setEntity(requestEntity);
       try {
         HttpResponse fwdResponse = httpClient.execute(post);
+        
+        if(fwdResponse.getStatusLine().getStatusCode()!=200) {
+          statusCode = 502;
+        }
+        
         HttpEntity fwdResponseBodyentity = fwdResponse.getEntity();
         String fwdResponseBodyString = EntityUtils.toString(fwdResponseBodyentity);
         JSONObject fwdResponseJsonObj = new JSONObject(fwdResponseBodyString);
         
-        fwdEr7 = fwdResponseJsonObj.getString("er7");
-        fwdXml = parser.hl7ToXml(fwdEr7);
-        JSONObject fwdJsonObj = XML.toJSONObject(fwdXml, true);
-        fwdJsonMap = new ObjectMapper().readValue(fwdJsonObj.toString(), Map.class);
+        retEr7 = fwdResponseJsonObj.getString("er7");
+        retXml = parser.hl7ToXml(retEr7);
+        JSONObject fwdJsonObj = XML.toJSONObject(retXml, true);
+        retJsonMap = new ObjectMapper().readValue(fwdJsonObj.toString(), Map.class);
         
       } catch (Exception e) {
         System.out.println("Error forwarding/parsing with "+requestHeaders.get("mllp-gateway"));
+        statusCode = 502;
+        errorMessage = errorMessage + "\n\nForwarding error: " + e.getMessage();
         e.printStackTrace();
       } finally {
         try {
           httpClient.close();
         } catch (IOException e) {
-          System.out.println("Error closing stream after sending HTTP POST to "+requestHeaders.get("mllp-gateway"));
+          System.out.println("Error closing httpClient after sending HTTP POST to "+requestHeaders.get("mllp-gateway"));
+          statusCode = 502;
+          errorMessage = errorMessage + "\n\nError closing httpClient: " + e.getMessage();
           e.printStackTrace();
         }
       }
@@ -153,7 +163,7 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
     Map<String, String> responseHeaders = new HashMap<>();
     responseHeaders.put("Content-Type", "application/json");
 
-    responseBody = new Response(jsonMap, xml, er7, errorMessage, fwdJsonMap, fwdXml, fwdEr7);
+    responseBody = new Response(jsonMap, xml, er7, errorMessage, retJsonMap, retXml, retEr7);
     return ApiGatewayResponse.builder().setStatusCode(statusCode).setObjectBody(responseBody).setHeaders(responseHeaders)
         .build();
   }

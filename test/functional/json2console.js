@@ -14,8 +14,14 @@ process.stdin.on("data", (data) => {
   ) {
     s = obj;
   } else {
-    delete obj["ORU_R01"]["xmlns"];
-    delete obj["ORU_R01"]["MSH"]["MSH.7"]["TS.1"];
+    if (obj["ORU_R01"]) delete obj["ORU_R01"]["xmlns"];
+    if (
+      obj["ORU_R01"] &&
+      obj["ORU_R01"]["MSH"] &&
+      obj["ORU_R01"]["MSH"]["MSH.7"]
+    ){
+      delete obj["ORU_R01"]["MSH"]["MSH.7"]["TS.1"];
+    }
     s = stringify(obj, function (a, b) {
       return a.key > b.key ? 1 : -1;
     });

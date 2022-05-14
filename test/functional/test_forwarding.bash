@@ -14,7 +14,7 @@ cmd="curl -s -X POST -H \"Content-Type: application/json\" -H \"Forward-To: $FOR
 echo -e "\n$cmd\n"
 eval $cmd
 
-cmd="cat tmp_response_gateway_all.json | node json2console.js fwdJson > tmp_response_gateway_json.json"
+cmd="cat tmp_response_gateway_all.json | node json2console.js retJson > tmp_response_gateway_json.json"
 echo $cmd
 eval $cmd
 

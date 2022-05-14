@@ -8,7 +8,7 @@ When deployed this stack stands up a HTTP endpoint that supports transforms of H
 
 ##### MLLP
 
-ER7 messages can also be forwarded directly to a HTTP-MLLP gateway (eg. [http-mllp-node](https://github.com/whitebrick/http-mllp-node)) and the ACK response parsed and returned in `JSON`, `XML` and `ER7` formats.
+ER7 messages can also be forwarded directly to a HTTP-MLLP gateway (eg. [http-mllp-node](https://github.com/whitebrick/http-mllp-node)) using headers (see below) and the ACK response parsed and returned in `JSON`, `XML` and `ER7` formats.
 
 A simple MLLP HL7 V2.x ACK response server is available for testing, more information [here](https://hl7v2-test.whitebrick.com).
 
@@ -59,10 +59,9 @@ If `MLLP-Gateway` and `Forward-To` headers are included, the er7 message is forw
   "xml": "<PID.5>\n  <XPN.1>\n    <FN.1>Miller</FN.1>\n  </XPN.1>\n ...",
   "er7": "PID|1| ... |Miller^Paul^One^^^^L|| ...\r",
   "error": "null | <error message>",
-  "fwdJson": { "MSH.22": "AA", "MSH.12": { "VID.1": "2.5.1" }, "MSH.23": "20101001091300" },
-  "fwdXml": "<MSH.22>AA</MSH.22>\n <MSH.23>201010010913000772</MSH.23>\n </MSH>\n ...",
-  "fwdEr7": "... ^^2.16.840.1.114222.4.10.3^ISOMSA|AA|201010010913000772 ...\r",
-  "fwdError": "null | <error message>"
+  "retJson": { "MSH.22": "AA", "MSH.12": { "VID.1": "2.5.1" }, "MSH.23": "20101001091300" },
+  "retXml": "<MSH.22>AA</MSH.22>\n <MSH.23>201010010913000772</MSH.23>\n </MSH>\n ...",
+  "retEr7": "... ^^2.16.840.1.114222.4.10.3^ISOMSA|AA|201010010913000772 ...\r",
 }
 ```
 
@@ -134,4 +133,3 @@ serverless deploy [--stage <stage>]
 ### Contributing
 
 - Questions, comments, suggestions and contributions welcome - contact: _hello_ at _whitebrick_ dot _com_
-
