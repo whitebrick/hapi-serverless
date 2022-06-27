@@ -71,15 +71,15 @@ Requests are switched using the `Content-Type` header
 
 - Example `JSON` request
 ```
-curl -X POST -H "Content-Type: application/json" --data-binary @./test/cerner_ORU_R01.json https://hapi.whitebrick.com
+curl -X POST -H "Content-Type: application/json" --data-binary @./test/functional/cerner_ORU_R01.json https://hapi.whitebrick.com
 ```
 - Example `XML` request
 ```
-curl -X POST -H "Content-Type: application/xml" --data-binary @./test/cerner_ORU_R01.xml https://hapi.whitebrick.com
+curl -X POST -H "Content-Type: application/xml" --data-binary @./test/functional/cerner_ORU_R01.xml https://hapi.whitebrick.com
 ```
 - Example `ER7` request
 ```
-curl -X POST -H "Content-Type: text/plain" --data-binary @./test/cerner_ORU_R01.er7 https://hapi.whitebrick.com
+curl -X POST -H "Content-Type: text/plain" --data-binary @./test/functional/cerner_ORU_R01.er7 https://hapi.whitebrick.com
 ```
 
 - Example forwarding request (can be used with any format)
