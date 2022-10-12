@@ -51,7 +51,7 @@ The message is parsed and the server responds with JSON containing either all 3 
 
 ##### ER7 Message Forwarding
 
-If `MLLP-Gateway` and `Forward-To` headers are included, the er7 message is forwarded to the host and port specified in the `MLLP-Gateway`  header value, along with the `Forward-To` header and value. The response from the gateway is parsed and added to the HTTP response as below (see [test example](https://github.com/whitebrick/hapi-serverless/blob/main/test/cerner_ORU_R01_ACK.json)).
+If `MLLP-Gateway` and `Forward-To` headers are included, the er7 message is forwarded to the host and port specified in the `MLLP-Gateway`  header value, along with the `Forward-To` header and value. The response from the gateway is parsed and added to the HTTP response as below (see [test example](https://github.com/whitebrick/hapi-serverless/blob/main/test/functional/cerner_ORU_R01_ACK.json)).
 
 ```json
 {
