@@ -16,7 +16,7 @@ A simple MLLP HL7 V2.x ACK response server is available for testing, more inform
 
 The endpoint receives a HTTP POST request containing either:
 
-1. A JSON representation of a HL7 message (see [test example](https://github.com/whitebrick/hapi-serverless/blob/main/test/cerner_ORU_R01.json))
+1. A JSON representation of a HL7 message (see [test example](https://github.com/whitebrick/hapi-serverless/blob/main/test/functional/cerner_ORU_R01.json))
 ```json
 "PID.5": {
   "XPN.1": {
@@ -25,7 +25,7 @@ The endpoint receives a HTTP POST request containing either:
   "XPN.2": "Paul",
 ```
 
-2. OR an XML representation of a HL7 message (see [test example](https://github.com/whitebrick/hapi-serverless/blob/main/test/cerner_ORU_R01.xml))
+2. OR an XML representation of a HL7 message (see [test example](https://github.com/whitebrick/hapi-serverless/blob/main/test/functional/cerner_ORU_R01.xml))
 ```xml
 <PID.5>
   <XPN.1>
@@ -33,7 +33,7 @@ The endpoint receives a HTTP POST request containing either:
   </XPN.1>
   <XPN.2>Paul</XPN.2>
 ```
-3. OR an ER7 (pipe-delimited) representation of a HL7 message (see [test example](https://github.com/whitebrick/hapi-serverless/blob/main/test/cerner_ORU_R01.er7))
+3. OR an ER7 (pipe-delimited) representation of a HL7 message (see [test example](https://github.com/whitebrick/hapi-serverless/blob/main/test/functional/cerner_ORU_R01.er7))
 ```
 PID|1||9339683996^^^Baseline West MC&33D1234567&L^MR^Baseline West MC&33D1234567&L|7903^^^Cerner Corp|Miller^Paul^One^^^^L||20050715050000|M||White^Caucasian^HL70005|555 Flower Street^^Aurora^CO^80011^USA^C||^PRN^PH^^^303^5549936||||||765894312|||N^Non Hispanic^HL70189
 ```
