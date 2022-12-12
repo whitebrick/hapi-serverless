@@ -46,7 +46,8 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
 
   @Override
   public ApiGatewayResponse handleRequest(Map<String, Object> input, Context context) {
-    LOG.info("handleRequest input: " + input);
+    
+    //LOG.info("handleRequest input: " + input);
 
     JSONObject jsonObj = null;
     Map<String, Object> jsonMap = null;
@@ -64,9 +65,10 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
     parser.setStrictMode(false);
 
     Map<String, String> requestHeaders = new HashMap<String, String>();
+    Map<String, String> requestParams = new HashMap<String, String>();
 
     try {
-
+           
       requestHeaders = ((Map<String, String>) input.get("headers")).entrySet().stream()
           .collect(Collectors.toMap(entry -> entry.getKey().toLowerCase(), entry -> entry.getValue()));
 
@@ -162,8 +164,28 @@ public class Parser implements RequestHandler<Map<String, Object>, ApiGatewayRes
 
     Map<String, String> responseHeaders = new HashMap<>();
     responseHeaders.put("Content-Type", "application/json");
-
+    
     responseBody = new Response(jsonMap, xml, er7, errorMessage, retJsonMap, retXml, retEr7);
+    
+    if(input.containsKey("queryStringParameters") && (input.get("queryStringParameters")!=null) && (errorMessage==null)) {
+      requestParams = ((Map<String, String>) input.get("queryStringParameters")).entrySet().stream()
+          .collect(Collectors.toMap(entry -> entry.getKey().toLowerCase(), entry -> entry.getValue()));
+    
+      if(requestParams.containsKey("prune_for") && (requestParams.get("prune_for")!=null)) {
+        LOG.info("Pruning response: prune_for=" + requestParams.get("prune_for"));
+        switch(requestParams.get("prune_for")) {
+          case "json":
+            responseBody = new Response(jsonMap, null, null, null, retJsonMap, null, null);
+            break;
+          case "xml":
+            responseBody = new Response(null, xml, null, null, null, retXml, null);
+            break;
+          case "er7":
+            responseBody = new Response(null, null, er7, null, null, null, retEr7);
+            break;
+        }
+      }
+    }
     return ApiGatewayResponse.builder().setStatusCode(statusCode).setObjectBody(responseBody).setHeaders(responseHeaders)
         .build();
   }

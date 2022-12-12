@@ -39,15 +39,15 @@ public class Response {
     return this.error;
   }
 
-  public Map<String, Object> getretJson() {
+  public Map<String, Object> getRetJson() {
     return this.retJsonMap;
   }
 
-  public String getretXml() {
+  public String getRetXml() {
     return this.retXml;
   }
 
-  public String getretEr7() {
+  public String getRetEr7() {
     return this.retEr7;
   }
 }
