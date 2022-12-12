@@ -38,7 +38,7 @@ The endpoint receives a HTTP POST request containing either:
 PID|1||9339683996^^^Baseline West MC&33D1234567&L^MR^Baseline West MC&33D1234567&L|7903^^^Cerner Corp|Miller^Paul^One^^^^L||20050715050000|M||White^Caucasian^HL70005|555 Flower Street^^Aurora^CO^80011^USA^C||^PRN^PH^^^303^5549936||||||765894312|||N^Non Hispanic^HL70189
 ```
 
-The message is parsed and the server responds with JSON containing either all 3 formats of the HL7 message or an error.
+The message is parsed and the server responds with JSON containing either all 3 formats of the HL7 message or an error. If this response is too verbose, the `?prune_for=json|xml|er7` request parameter can also be passed to nullify the other keys.
 
 ```json
 {
